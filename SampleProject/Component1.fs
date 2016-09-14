@@ -5,3 +5,4 @@ type Class1() =
 
 module Module=
     let t = 1
+    let y = Class1()
