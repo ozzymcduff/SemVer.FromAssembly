@@ -1,92 +1,103 @@
 ﻿namespace SemVer.FromAssembly
 open System
 
-type Changes<'Key,'Value when 'Key : comparison > =
+// === types repressenting package surface area
+
+type SurfaceOfType ={ Members:Set<string> }
+
+type Namespace=
     {
-        // added :: Map.Map k v
-        added: Map<'Key,'Value>
-        // changed :: Map.Map k (v,v)
-        changed: Map<'Key,'Value*'Value>
-        // removed :: Map.Map k v
-        removed: Map<'Key,'Value>
+        adts: Map<string,SurfaceOfType>
+    }
+type Package=
+    {
+        Namespaces: Map<string, Namespace>
+    }
+
+
+// === types repressenting package surface area comparison
+
+type AddedAndRemoved<'T when 'T : comparison>=
+    {
+        Added: Set<'T>
+        Removed: Set<'T>
     }
 
 type NamespaceChanges=
     {
-        // adtChanges :: Changes String ([String], Map.Map String [Type.Type])
-        adtChanges: Changes<string,string list*Map<string,Type list>>
-        // aliasChanges :: Changes String ([String], Type.Type)
-        //aliasChanges: Changes<string,string list*Type>
-        // valueChanges :: Changes String Type.Type
-        //valueChanges: Changes<string,Type>
+        AdtAdded: Set<string>
+        AdtChanges: Map<string,AddedAndRemoved<string>>
+        AdtRemoved: Set<string>
     }
 
 type PackageChanges=
     { 
-        // modulesAdded :: [String]
-        NamespacesAdded : string list
-        // modulesChanged :: Map.Map String ModuleChanges
+        NamespacesAdded : Set<string>
         NamespacesChanged: Map<string,NamespaceChanges>
-        // modulesRemoved :: [String]
-        NamespacesRemoved: string list
+        NamespacesRemoved: Set<string>
     }
+// 
+module Map=
+    let keys map = map |> Map.toSeq |> Seq.map fst
 
-type Namespace=
-    {
-        // adts :: Map.Map String ([String], Map.Map String [Type.Type])
-        adts: Map<string,string list*Map<string,Type list>>
-    }
-(*
-data Module = Module
-    { adts :: Map.Map String ([String], Map.Map String [Type.Type])
-    , aliases :: Map.Map String ([String], Type.Type)
-    , values :: Map.Map String Type.Type
-    , version :: Docs.Version
-    }
-    *)
 module Compare=
-    let private keys map = map |> Map.toSeq |> Seq.map fst
-    let isEquivalentAdt (ignoreOrigin:bool) 
-                        (oldVars:string list, oldCtors: Map<string,Type list>) 
-                        (newVars:string list, newCtors: Map<string,Type list>) 
-                            =
-                                oldCtors.Count = newCtors.Count
-                                //&& List.zip (keys oldCtors) (keys newCtors)
-                                // && and (zipWith (==) (Map.keys oldCtors) (Map.keys newCtors))
+
+    let compareTypes (oldT:SurfaceOfType) (newT:SurfaceOfType) : AddedAndRemoved<string>
+                        =
+                        let newM = (newT.Members) 
+                        let oldM = (oldT.Members)
+                        {
+                           Added = Set.difference newM oldM
+                           Removed = Set.difference oldM newM
+                        }
+    let typeComparisonIsEmpty (c:AddedAndRemoved<string>)
+                        = (Set.isEmpty c.Added) && (Set.isEmpty c.Removed) 
+            
+
+    let compareNamespaces (oldNs:Namespace) (newNs:Namespace) : NamespaceChanges
+                        =
+                        let newTs = (newNs.adts) |> Map.keys |> set
+                        let oldTs = (oldNs.adts) |> Map.keys |> set
+
+                        let maybeChanged = Set.intersect newTs oldTs
+                        let compareTypesWithName t=
+                            let newT = newNs.adts.Item t
+                            let oldT = oldNs.adts.Item t
+                            compareTypes oldT newT
+
+                        let changed = maybeChanged 
+                                    |> Seq.map (fun t->t, compareTypesWithName t ) 
+                                    |> Seq.filter (fun (_,c)-> not (typeComparisonIsEmpty c))
+                                    |> Map.ofSeq
+                        {
+                            AdtAdded=Set.difference newTs oldTs
+                            AdtChanges=changed
+                            AdtRemoved=Set.difference oldTs newTs
+                        }
+
+    let namespaceComparisonIsEmpty (n:NamespaceChanges)
+                        = (Set.isEmpty n.AdtAdded) && (Set.isEmpty n.AdtRemoved) && (Map.isEmpty n.AdtChanges)
+
+
+    let comparePackages (oldP:Package) (newP:Package) : PackageChanges
+                        = 
+                          let newNss = (newP.Namespaces) |> Map.keys |> set
+                          let oldNss = (oldP.Namespaces) |> Map.keys |> set
+                          let maybeChanged = Set.intersect newNss oldNss
+                          let compareNsWithName ns=
+                              let oldN=oldP.Namespaces.Item ns
+                              let newN=newP.Namespaces.Item ns 
+                              compareNamespaces oldN newN
+                          let changed = maybeChanged 
+                                        |> Seq.map (fun ns-> ns, (compareNsWithName ns ) ) 
+                                        |> Seq.filter (fun (_,cn) -> not (namespaceComparisonIsEmpty cn) )
+                                        |> Map.ofSeq
+
+                          {
+                             NamespacesAdded= Set.difference newNss oldNss
+                             NamespacesRemoved=Set.difference oldNss newNss
+                             NamespacesChanged = changed
+                          }
+                             
                          
-(*
-
-isEquivalentAdt
-    :: Bool
-    -> ([String], Map.Map String [Type.Type])
-    -> ([String], Map.Map String [Type.Type])
-    -> Bool
-isEquivalentAdt ignoreOrigin (oldVars, oldCtors) (newVars, newCtors) =
-    Map.size oldCtors == Map.size newCtors
-    && and (zipWith (==) (Map.keys oldCtors) (Map.keys newCtors))
-    && and (Map.elems (Map.intersectionWith equiv oldCtors newCtors))
-  where
-    equiv :: [Type.Type] -> [Type.Type] -> Bool
-    equiv oldTypes newTypes =
-        let
-          allEquivalent =
-              zipWith
-                (isEquivalentType ignoreOrigin)
-                (map ((,) oldVars) oldTypes)
-                (map ((,) newVars) newTypes)
-        in
-          length oldTypes == length newTypes
-          && and allEquivalent
-
-
-isEquivalentType :: Bool -> ([String], Type.Type) -> ([String], Type.Type) -> Bool
-isEquivalentType ignoreOrigin (oldVars, oldType) (newVars, newType) =
-  case diffType ignoreOrigin oldType newType of
-    Nothing ->
-        False
-
-    Just renamings ->
-        length oldVars == length newVars
-        && isEquivalentRenaming (zip oldVars newVars ++ renamings)
-
-*)
+    

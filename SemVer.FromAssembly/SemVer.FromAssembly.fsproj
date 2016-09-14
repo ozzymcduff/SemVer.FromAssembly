@@ -44,6 +44,7 @@
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="Magnitude.fs" />
+    <Compile Include="Model.fs" />
     <Compile Include="Compare.fs" />
     <Compile Include="SurfaceArea.fs" />
     <Compile Include="Script.fsx" />
