@@ -2,10 +2,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{BCC02843-21C2-4A9D-8DA8-BFE70F183B4F}</ProjectGuid>
+    <ProjectGuid>{897EAD44-8F5E-4762-96B4-1D37DC2E0FAF}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>SemVer.FromAssembly</RootNamespace>
-    <AssemblyName>SemVer</AssemblyName>
+    <RootNamespace>Tests</RootNamespace>
+    <AssemblyName>Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -33,23 +33,27 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
+    <Reference Include="FSharp.Core" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
-    <Reference Include="FSharp.Core">
-      <HintPath>..\packages\FSharp.Core.4.0.1.5\lib\net40\FSharp.Core.dll</HintPath>
-      <Private>False</Private>
+    <Reference Include="nunit.framework">
+      <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
-    <Compile Include="Magnitude.fs" />
-    <Compile Include="Compare.fs" />
-    <Compile Include="SurfaceArea.fs" />
-    <Compile Include="Script.fsx" />
+    <Compile Include="Helpers.fs" />
+    <Compile Include="Component1.fs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SemVer.FromAssembly\SemVer.FromAssembly.fsproj">
+      <Project>{BCC02843-21C2-4A9D-8DA8-BFE70F183B4F}</Project>
+      <Name>SemVer.FromAssembly</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(FSharpTargetsPath)" />
 </Project>

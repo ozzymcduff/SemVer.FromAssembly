@@ -10,22 +10,4 @@ open SemVer.FromAssembly
 #load "SurfaceArea.fs"
 
 
-printfn "%O" (SurfaceArea.get (typeof<SampleProject.Class1>.Assembly))
-
-(*
-let sample2= [|("SampleProject",
-                              [|("Class1",
-                                 [|"System.String get_X()"; "Boolean Equals(System.Object)";
-                                   "Int32 GetHashCode()"; "System.Type GetType()";
-                                   "System.String ToString()"; "Void .ctor()"; "System.String X"|]);
-                                ("Module",
-                                 [|"Int32 get_t()"; "SampleProject.Class1 get_y()";
-                                   "Boolean Equals(System.Object)"; "Int32 GetHashCode()";
-                                   "System.Type GetType()"; "System.String ToString()"; "Int32 t";
-                                   "SampleProject.Class1 y"|])|]);
-                             (null,
-                              [|("Script",
-                                 [|"Boolean Equals(System.Object)"; "Int32 GetHashCode()";
-                                   "System.Type GetType()"; "System.String ToString()"|])|])|]
-
-                                   *)
+printfn "%A" (SurfaceArea.get (typeof<SampleProject.Class1>.Assembly))
