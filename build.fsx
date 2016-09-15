@@ -86,6 +86,7 @@ Target "push" (fun _ ->
 
 Target "all" DoNothing
 "clean"
+  ==> "build"
   ==> "pack"
 
 "clean"
