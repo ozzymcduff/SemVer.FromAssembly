@@ -1,5 +1,5 @@
 ﻿namespace SemVer.FromAssembly
 type Magnitude=
-    | Patch
-    | Minor
-    | Major
+    | Patch =0
+    | Minor =1
+    | Major =2

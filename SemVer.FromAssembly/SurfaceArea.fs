@@ -6,7 +6,7 @@ module SurfaceArea =
     open System.Text.RegularExpressions
     // from https://github.com/Microsoft/visualfsharp/blob/master/src/fsharp/FSharp.Core.Unittests/LibraryTestFx.fs
     // gets public surface area for the assembly
-    let get (asm:Assembly)=
+    let get (asm:Assembly) : Package=
     
         // public types only
         let types =
