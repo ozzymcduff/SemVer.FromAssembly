@@ -1,0 +1,5 @@
+source https://api.nuget.org/v3/index.json
+framework >= net451
+
+nuget FSharp.Core 4.0.0.1
+nuget NUnit 2.6.4

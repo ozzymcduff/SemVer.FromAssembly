@@ -1,6 +1,11 @@
 
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".paket", ".paket", "{30F916DC-ADA7-4D00-B00E-581F2E3DD40B}"
+	ProjectSection(SolutionItems) = preProject
+		paket.dependencies = paket.dependencies
+	EndProjectSection
+EndProject
 Project("{f2a71f9b-5d33-465a-a702-920d77279786}") = "SemVer.FromAssembly", "SemVer.FromAssembly\SemVer.FromAssembly.fsproj", "{BCC02843-21C2-4A9D-8DA8-BFE70F183B4F}"
 EndProject
 Project("{f2a71f9b-5d33-465a-a702-920d77279786}") = "SampleProject", "SampleProject\SampleProject.fsproj", "{9A22A5C7-577C-4EB3-8D4D-E911B8852ED0}"
