@@ -48,6 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="paket.references" />
+    <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SemVer.FromAssembly\SemVer.FromAssembly.fsproj">
