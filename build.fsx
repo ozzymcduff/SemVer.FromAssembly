@@ -80,6 +80,11 @@ Target "push" (fun _ ->
             WorkingDir = "bin" })
 )
 
+Target "bump" (fun _ ->
+    Paket.Push(fun p -> 
+        { p with
+            WorkingDir = "bin" })
+)
 
 // --------------------------------------------------------------------------------------
 // Run all targets by default. Invoke 'build <Target>' to override

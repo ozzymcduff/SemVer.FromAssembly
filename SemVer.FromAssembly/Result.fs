@@ -1,0 +1,8 @@
+﻿namespace SemVer.FromAssembly
+type Result<'T,'TError> = 
+         | Ok of 'T 
+         | Error of 'TError
+module Result =
+    let map f inp = match inp with Error e -> Error e | Ok x -> Ok (f x)
+    let mapError f inp = match inp with Error e -> Error (f e) | Ok x -> Ok x
+    let bind f inp = match inp with Error e -> Error e | Ok x -> f x
