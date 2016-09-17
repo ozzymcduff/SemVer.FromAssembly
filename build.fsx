@@ -8,9 +8,9 @@ open Fake.Git
 open Fake.AssemblyInfoFile
 open Fake.ReleaseNotesHelper
 open Fake.UserInputHelper
+open Fake.VersionHelper
 open System
 open System.IO
-open System.Reflection
 
 // File system information 
 let solutionFile  = "SemVer.FromAssembly.sln"
@@ -29,8 +29,6 @@ let (|Fsproj|Csproj|Vbproj|) (projFileName:string) =
     | f when f.EndsWith("csproj") -> Csproj
     | f when f.EndsWith("vbproj") -> Vbproj
     | _                           -> failwith (sprintf "Project file %s not supported. Unknown project type." projFileName)
-
-let getVersion file = AssemblyName.GetAssemblyName(file).Version.ToString()
 
 
 // Copies binaries from default VS location to expected bin folder
@@ -81,10 +79,10 @@ Target "push" (fun _ ->
 )
 
 // #r @"SemVer.FromAssembly/bin/Debug/SemVer.FromAssembly.exe"
-open SemVer.FromAssembly
+// open SemVer.FromAssembly
 Target "bump" (fun _ ->
     let compiled = "./SemVer.FromAssembly/bin/Release/SemVer.FromAssembly.exe"
-    let version = getVersion compiled
+    let version = GetAssemblyVersionString compiled
     // Paket install the latest version OR use command line nuget:
     (*
     ProcessHelper.shellExec { 
