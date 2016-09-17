@@ -13,9 +13,9 @@ with
     interface IArgParserTemplate with
         member s.Usage =
             match s with
-            | Surface_of _ -> "specify a file."
-            | Diff _ -> "specify original and new"
-            | Magnitude _-> "specify original and new"
+            | Surface_of _ -> "Get the public api surface of the .net binary as json"
+            | Diff _ -> "Get the difference between two .net binaries as json"
+            | Magnitude _-> "Get the magnitude of the difference between two .net binaries"
 type Result<'T,'TError> = 
          | Ok of 'T 
          | Error of 'TError

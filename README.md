@@ -11,9 +11,9 @@ USAGE: SemVer.FromAssembly.exe [--help] [--surface-of <path>] [--diff <original>
 
 OPTIONS:
 
-    --surface-of <path>   specify a file.
+    --surface-of <path>   Get the public api surface of the .net binary as json
     --diff <original> <new>
-                          specify original and new
+                          Get the difference between two .net binaries as json
     --magnitude <original> <new>
-                          specify original and new
+                          Get the magnitude of the difference between two .net binaries
     --help                display this list of options.

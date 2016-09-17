@@ -15,6 +15,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A4472262-20E5-472F-A827-82E880737673}"
 	ProjectSection(SolutionItems) = preProject
 		build.fsx = build.fsx
+		README.md = README.md
 	EndProjectSection
 EndProject
 Global
