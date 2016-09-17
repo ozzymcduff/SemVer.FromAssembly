@@ -80,6 +80,7 @@ Target "push" (fun _ ->
 
 #r @"./packages/SemVer.FromAssembly/tools/SemVer.FromAssembly.exe"
 open SemVer.FromAssembly
+
 Target "bump" (fun _ ->
     let compiled = "./SemVer.FromAssembly/bin/Release/SemVer.FromAssembly.exe"
     let version = GetAssemblyVersionString compiled
@@ -91,8 +92,17 @@ Target "bump" (fun _ ->
         WorkingDirectory=""
         Args=[]
     }*)
-    SemVer.getMagnitude "./packages/SemVer.FromAssembly/tools/SemVer.FromAssembly.exe" compiled
-    |> printf "%A"
+    let maybeMagnitude = SemVer.getMagnitude "./packages/SemVer.FromAssembly/tools/SemVer.FromAssembly.exe" compiled
+    let v = parseVersion(version)
+    match maybeMagnitude with 
+    | Result.Ok m ->
+        match m with
+        | Magnitude.Major m-> { v with Major=v.Major+1 }
+        | Magnitude.Minor m-> { v with Minor=v.Minor+1 }
+        | Magnitude.Patch m-> { v with Patch=v.Patch+1 }
+        |> printfn "%A"
+    | Result.Error err->
+        printfn "Error: %s" err
     () 
 )
 
@@ -109,6 +119,9 @@ Target "all" DoNothing
   ==> "CopyBinaries"
   ==> "test"
   ==> "all"
+
+"build"
+  ==> "bump"
 
 "pack"
   ==> "push"
