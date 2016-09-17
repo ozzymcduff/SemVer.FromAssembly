@@ -6,3 +6,5 @@ nuget FSharp.Core ~> 4 redirects: force
 nuget NUnit 2.6.4
 nuget NUnit.Runners 2.6.4
 nuget FAKE
+nuget Argu
+nuget Chiron

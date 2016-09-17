@@ -12,6 +12,6 @@ let transform (input:((string*(string*string list)list))list)=
 
     let namespaces =
         input 
-        |> List.map (fun (ns,ts)-> (ns,{ adts = mapToAdts ts })) 
+        |> List.map (fun (ns,ts)-> (ns,{ Adts = mapToAdts ts })) 
         |> Map.ofSeq
     {Namespaces=namespaces}

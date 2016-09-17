@@ -22,6 +22,9 @@ module SurfaceArea =
             |> Array.map (fun t-> (t.Namespace, (t.Name,{Members=set (getTypeMembers t)})))
             |> Array.groupBy (fun (ns,_)->ns)
             |> Array.map (fun (ns,ns_ts)-> (ns,ns_ts |> Array.map snd)) 
-            |> Array.map (fun (ns,ts)-> (ns, {adts= ts|> Map.ofSeq } ))
+            |> Array.map (fun (ns,ts)-> ((if ns <> null then ns else ""), 
+                                           {
+                                            Adts= ts|> Map.ofSeq 
+                                           } ))
             |> Map.ofSeq
         {Namespaces=actual}
