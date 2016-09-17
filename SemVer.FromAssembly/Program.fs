@@ -63,9 +63,9 @@ module Program=
             Error "Couldn't start process"
 
     let surfaceAreaCli file=
-        let pathToProgram = Assembly.GetExecutingAssembly().Location
-        let cliArgs = sprintf "--surface-of '%s'" file
-        executeDotnetExe pathToProgram cliArgs
+        let exe = Assembly.GetExecutingAssembly().Location
+        let args = sprintf "--surface-of '%s'" file
+        executeDotnetExe exe args
         |> Result.map 
             (fun output->
                 output
