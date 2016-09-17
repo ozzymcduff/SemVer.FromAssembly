@@ -3,8 +3,10 @@ open System
 open Argu
 open Chiron
 open System.Reflection
+open System.IO
 type CLIArguments =
     | Surface_of of path:string
+    | Output of path:string
     | Diff of original:string * ``new``:string
     | Magnitude of original:string * ``new``:string
 with
@@ -14,18 +16,23 @@ with
             | Surface_of _ -> "Get the public api surface of the .net binary as json"
             | Diff _ -> "Get the difference between two .net binaries as json"
             | Magnitude _-> "Get the magnitude of the difference between two .net binaries"
+            | Output _-> "Send output to file"
 module SemVer=
     let surfaceAreaCli file : Result<Package,string>=
-        if System.IO.File.Exists file then
+        if File.Exists file then
             let exe = typeof<CLIArguments>.Assembly.Location
-            let args = sprintf "--surface-of '%s'" file
+            let tmp = Path.GetTempFileName()
+            try
+            let args = sprintf "--surface-of '%s' --output '%s'" file tmp
             Process.executeDotnetExe exe args
             |> Result.map 
                 (fun output->
-                    output
+                    File.ReadAllText tmp
                     |> Json.parse
                     |> Json.deserialize
                 )
+            finally
+            if File.Exists tmp then File.Delete tmp 
         else
             Result.Error (sprintf "Could not find file %s " file)
 
@@ -49,17 +56,15 @@ module SemVer=
             |> Result.map Compare.packageChangeMagnitude 
 
 
-    let writeResult (res:Result<string,string>)=
-        match res with
-        | Ok msg-> Console.WriteLine msg ; 0
-        | Result.Error msg->Console.Error.WriteLine msg ; 1
-
-
     [<EntryPoint>]
     let main argv = 
         let parser = ArgumentParser.Create<CLIArguments>(programName = "SemVer.FromAssembly.exe")
 
         let results = parser.Parse argv
+        let writeResult (res:Result<string,string>)=
+            match res with
+            | Ok msg-> Console.WriteLine msg ; 0
+            | Result.Error msg->Console.Error.WriteLine msg ; 1
 
         let all = results.GetAllResults()
         if List.isEmpty all || results.IsUsageRequested then
@@ -68,6 +73,7 @@ module SemVer=
             let maybeFile = results.TryGetResult(<@ Surface_of @>)
             let maybeDiff = results.TryGetResult(<@ Diff @>)
             let maybeMagnitude = results.TryGetResult(<@ Magnitude @>)
+            let maybeOutput = results.TryGetResult(<@ Output @>)
             match maybeFile, maybeDiff, maybeMagnitude with
             | Some file, None, None ->
                 let assembly = Assembly.LoadFrom(file)
@@ -85,6 +91,13 @@ module SemVer=
             | None, None, Some (original,new_) ->
                 getMagnitude original new_
                 |> Result.map (fun m-> m.ToString()) 
-             | _, _,_ ->
+            | _, _,_ ->
                 Result.Error(parser.PrintUsage())
+            |> (fun res-> 
+                match res, maybeOutput with
+                | Result.Ok content, Some output-> 
+                    File.WriteAllText(output, content)
+                    res
+                | _ -> res
+                )
         |> writeResult

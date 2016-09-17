@@ -78,8 +78,8 @@ Target "push" (fun _ ->
             WorkingDir = "bin" })
 )
 
-// #r @"SemVer.FromAssembly/bin/Debug/SemVer.FromAssembly.exe"
-// open SemVer.FromAssembly
+#r @"./packages/SemVer.FromAssembly/tools/SemVer.FromAssembly.exe"
+open SemVer.FromAssembly
 Target "bump" (fun _ ->
     let compiled = "./SemVer.FromAssembly/bin/Release/SemVer.FromAssembly.exe"
     let version = GetAssemblyVersionString compiled
@@ -90,10 +90,9 @@ Target "bump" (fun _ ->
         Program="nuget" // using nuget gem ...
         WorkingDirectory=""
         Args=[]
-    }
-    *)
-    //SemVer.getMagnitude "./package/SemVer.FromAssembly/tools/SemVer.FromAssembly.exe" compiled
-    //|> printf "%A"
+    }*)
+    SemVer.getMagnitude "./packages/SemVer.FromAssembly/tools/SemVer.FromAssembly.exe" compiled
+    |> printf "%A"
     () 
 )
 
