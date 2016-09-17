@@ -1,4 +1,5 @@
 ﻿namespace SemVer.FromAssembly
+[<System.Obsolete("Will be obsolete once F# Core 4.1 is released")>]
 type Result<'T,'TError> = 
          | Ok of 'T 
          | Error of 'TError

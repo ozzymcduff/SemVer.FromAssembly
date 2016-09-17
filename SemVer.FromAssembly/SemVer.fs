@@ -14,7 +14,7 @@ with
             | Surface_of _ -> "Get the public api surface of the .net binary as json"
             | Diff _ -> "Get the difference between two .net binaries as json"
             | Magnitude _-> "Get the magnitude of the difference between two .net binaries"
-module Program=
+module SemVer=
     let surfaceAreaCli file : Result<Package,string>=
         let exe = typeof<CLIArguments>.Assembly.Location
         let args = sprintf "--surface-of '%s'" file
@@ -41,6 +41,11 @@ module Program=
                 |> List.toArray
             
             Result.Error (String.Join(Environment.NewLine, errors) )
+    let getMagnitude original new_ : Result<Magnitude,string>=
+            getDiff original new_
+            |> Result.map Compare.packageChangeMagnitude 
+
+
     let writeResult (res:Result<string,string>)=
         match res with
         | Ok msg-> Console.WriteLine msg ; 0
@@ -75,11 +80,8 @@ module Program=
                     |> Json.formatWith JsonFormattingOptions.Pretty
                     ) 
             | None, None, Some (original,new_) ->
-                getDiff original new_
-                |> Result.map (fun diff->
-                    let magnitude = Compare.packageChangeMagnitude diff
-                    magnitude.ToString()
-                    ) 
+                getMagnitude original new_
+                |> Result.map (fun m-> m.ToString()) 
              | _, _,_ ->
                 Result.Error(parser.PrintUsage())
         |> writeResult

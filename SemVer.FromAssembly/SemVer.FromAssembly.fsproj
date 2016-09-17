@@ -47,7 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Script.fsx" />
-    <Compile Include="Program.fs" />
+    <Compile Include="SemVer.fs" />
     <None Include="paket.references" />
     <None Include="paket.template" />
   </ItemGroup>
