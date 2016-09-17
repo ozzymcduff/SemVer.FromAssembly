@@ -5,3 +5,15 @@
 Autogenerate nuget package version based on surface area of the new package
 
 
+## Usage
+
+USAGE: SemVer.FromAssembly.exe [--help] [--surface-of <path>] [--diff <original> <new>] [--magnitude <original> <new>]
+
+OPTIONS:
+
+    --surface-of <path>   specify a file.
+    --diff <original> <new>
+                          specify original and new
+    --magnitude <original> <new>
+                          specify original and new
+    --help                display this list of options.
