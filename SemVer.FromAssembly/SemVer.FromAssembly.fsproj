@@ -42,7 +42,6 @@
     <Compile Include="Magnitude.fs" />
     <Compile Include="Compare.fs" />
     <Compile Include="SurfaceArea.fs" />
-    <Compile Include="Json.fs" />
     <Compile Include="Result.fs" />
     <Compile Include="Process.fs" />
   </ItemGroup>

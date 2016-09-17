@@ -81,9 +81,13 @@ Target "push" (fun _ ->
 )
 
 Target "bump" (fun _ ->
-    Paket.Push(fun p -> 
-        { p with
-            WorkingDir = "bin" })
+    (*
+    // todo: download nuget package from package source 
+    nuget install PACKAGE -Version 3.2.2.0 -ExcludeVersion -o bin/
+    // unzipped by nuget
+    // now possible to diff 
+    *)
+    () 
 )
 
 // --------------------------------------------------------------------------------------
