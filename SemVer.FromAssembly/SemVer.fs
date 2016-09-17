@@ -16,15 +16,18 @@ with
             | Magnitude _-> "Get the magnitude of the difference between two .net binaries"
 module SemVer=
     let surfaceAreaCli file : Result<Package,string>=
-        let exe = typeof<CLIArguments>.Assembly.Location
-        let args = sprintf "--surface-of '%s'" file
-        Process.executeDotnetExe exe args
-        |> Result.map 
-            (fun output->
-                output
-                |> Json.parse
-                |> Json.deserialize
-            )
+        if System.IO.File.Exists file then
+            let exe = typeof<CLIArguments>.Assembly.Location
+            let args = sprintf "--surface-of '%s'" file
+            Process.executeDotnetExe exe args
+            |> Result.map 
+                (fun output->
+                    output
+                    |> Json.parse
+                    |> Json.deserialize
+                )
+        else
+            Result.Error (sprintf "Could not find file %s " file)
 
     let getDiff original new_ : Result<PackageChanges,string>=
         let maybeOriginal,maybeNew_= surfaceAreaCli original, surfaceAreaCli new_

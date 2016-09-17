@@ -10,6 +10,7 @@ open Fake.ReleaseNotesHelper
 open Fake.UserInputHelper
 open System
 open System.IO
+open System.Reflection
 
 // File system information 
 let solutionFile  = "SemVer.FromAssembly.sln"
@@ -29,6 +30,7 @@ let (|Fsproj|Csproj|Vbproj|) (projFileName:string) =
     | f when f.EndsWith("vbproj") -> Vbproj
     | _                           -> failwith (sprintf "Project file %s not supported. Unknown project type." projFileName)
 
+let getVersion file = AssemblyName.GetAssemblyName(file).Version.ToString()
 
 
 // Copies binaries from default VS location to expected bin folder
@@ -45,8 +47,6 @@ Target "CopyBinaries" (fun _ ->
 
 Target "clean" (fun _ ->
     CleanDirs ["bin"; "temp"; 
-            "CSharp.Tests/bin/Release";
-            "CSharp.Tests/bin/Release";
             "Tests/bin/Debug";
             "Tests/bin/Debug"
             ] 
@@ -80,13 +80,22 @@ Target "push" (fun _ ->
             WorkingDir = "bin" })
 )
 
+// #r @"SemVer.FromAssembly/bin/Debug/SemVer.FromAssembly.exe"
+open SemVer.FromAssembly
 Target "bump" (fun _ ->
+    let compiled = "./SemVer.FromAssembly/bin/Release/SemVer.FromAssembly.exe"
+    let version = getVersion compiled
+    // Paket install the latest version OR use command line nuget:
     (*
-    // todo: download nuget package from package source 
-    nuget install PACKAGE -Version 3.2.2.0 -ExcludeVersion -o bin/
-    // unzipped by nuget
-    // now possible to diff 
+    ProcessHelper.shellExec { 
+        CommandLine=sprintf "install SemVer.FromAssembly -Version %s -ExcludeVersion -o bin/" version
+        Program="nuget" // using nuget gem ...
+        WorkingDirectory=""
+        Args=[]
+    }
     *)
+    //SemVer.getMagnitude "./package/SemVer.FromAssembly/tools/SemVer.FromAssembly.exe" compiled
+    //|> printf "%A"
     () 
 )
 
