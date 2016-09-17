@@ -5,6 +5,8 @@ open Chiron
 open System.Reflection
 open System.Diagnostics
 open System.IO
+open System.Text
+open System.Threading
 type CLIArguments =
     | Surface_of of path:string
     | Diff of original:string * ``new``:string
@@ -24,37 +26,52 @@ module Result =
     let bind f inp = match inp with Error e -> Error e | Ok x -> f x
 
 module Program=
-    let surfaceAreaCli file=
+    let executeDotnetExe exe args=
         use p = new Process()
         let isRunningMono = Type.GetType ("Mono.Runtime") <> null
-        let pathToProgram = Assembly.GetExecutingAssembly().Location//, "SemVer.FromAssembly.exe")
-        let cliArgs = sprintf "--surface-of '%s'" file
-        let exe = if isRunningMono then "mono" else pathToProgram
-        let args = if isRunningMono then sprintf "'%s' %s" pathToProgram cliArgs else cliArgs
+        let fileName = if isRunningMono then "mono" else exe
+        let arguments = if isRunningMono then sprintf "'%s' %s" exe args else args
         let st = ProcessStartInfo()
         st.CreateNoWindow <- true
         st.UseShellExecute <- false
         st.RedirectStandardOutput <- true
         st.RedirectStandardError <-true
-        st.FileName <- exe
+        st.FileName <- fileName
         st.WorkingDirectory <- Environment.CurrentDirectory
-        st.Arguments <- args
+        st.Arguments <- arguments
+        let output = new StringBuilder()
+        let error = new StringBuilder()
+        let createDataReceivedHandler (b:StringBuilder) =
+                new DataReceivedEventHandler(fun sender e->
+                    if e.Data <> null then
+                        b.Append(e.Data) |> ignore
+                    else
+                        ()
+                )
+
+        p.OutputDataReceived.AddHandler(createDataReceivedHandler output)
+        p.ErrorDataReceived.AddHandler(createDataReceivedHandler error)
         p.StartInfo <- st
         if p.Start() then
+            p.BeginOutputReadLine()
+            p.BeginErrorReadLine()
             p.WaitForExit()
+            match p.ExitCode with
+            | 0-> Ok (output.ToString())
+            | _-> Error (error.ToString())
+        else
+            Error "Couldn't start process"
 
-            let error = p.StandardError.ReadToEnd()
-            let output = p.StandardOutput.ReadToEnd()
-            match p.ExitCode, String.IsNullOrWhiteSpace output with
-            | 0,false->
+    let surfaceAreaCli file=
+        let pathToProgram = Assembly.GetExecutingAssembly().Location
+        let cliArgs = sprintf "--surface-of '%s'" file
+        executeDotnetExe pathToProgram cliArgs
+        |> Result.map 
+            (fun output->
                 output
                 |> Json.parse
                 |> Json.deserialize
-                |> Ok
-            | _,_->
-                Error error
-        else
-            Error "Couldn't start process"
+            )
 
     let getDiff original new_=
         let maybeOriginal,maybeNew_= surfaceAreaCli original, surfaceAreaCli new_
