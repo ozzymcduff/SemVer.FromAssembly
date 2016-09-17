@@ -19,6 +19,9 @@ with
 type Result<'T,'TError> = 
          | Ok of 'T 
          | Error of 'TError
+module Result =
+    let map f inp = match inp with Error e -> Error e | Ok x -> Ok (f x)
+    let bind f inp = match inp with Error e -> Error e | Ok x -> f x
 
 module Program=
     let surfaceAreaCli file=
@@ -68,6 +71,10 @@ module Program=
                 |> List.toArray
             
             Error (String.Join(Environment.NewLine, errors) )
+    let writeResult (res:Result<string,string>)=
+        match res with
+        | Ok msg-> Console.WriteLine msg ; 0
+        | Error msg->Console.Error.WriteLine msg ; 1
 
 
     [<EntryPoint>]
@@ -78,8 +85,7 @@ module Program=
 
         let all = results.GetAllResults()
         if List.isEmpty all || results.IsUsageRequested then
-            Console.WriteLine(parser.PrintUsage())
-            1
+            Error(parser.PrintUsage())
         else
             let maybeFile = results.TryGetResult(<@ Surface_of @>)
             let maybeDiff = results.TryGetResult(<@ Diff @>)
@@ -90,30 +96,20 @@ module Program=
                 (SurfaceArea.get assembly)
                 |> Json.serialize
                 |> Json.formatWith JsonFormattingOptions.Pretty
-                |> Console.WriteLine
-                0
+                |> Ok
             | None, Some ( original,new_), None ->
-                let maybeDiff = getDiff original new_
-                match maybeDiff with
-                | Ok diff-> 
+                getDiff original new_
+                |> Result.map (fun diff->
                     diff
                     |> Json.serialize
                     |> Json.formatWith JsonFormattingOptions.Pretty
-                    |> Console.WriteLine 
-                    0
-                | Error message-> 
-                    Console.Error.WriteLine message
-                    1
+                    ) 
             | None, None, Some (original,new_) ->
-                let maybeDiff = getDiff original new_
-                match maybeDiff with
-                | Ok diff-> 
+                getDiff original new_
+                |> Result.map (fun diff->
                     let magnitude = Compare.packageChangeMagnitude diff
-                    Console.WriteLine magnitude
-                    0
-                | Error message-> 
-                    Console.Error.WriteLine message
-                    1
+                    magnitude.ToString()
+                    ) 
              | _, _,_ ->
-                Console.WriteLine(parser.PrintUsage())
-                1
+                Error(parser.PrintUsage())
+        |> writeResult
