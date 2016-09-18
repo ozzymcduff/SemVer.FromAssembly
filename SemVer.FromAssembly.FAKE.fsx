@@ -9,10 +9,11 @@ open System
 
 let downloadOldVersion package version=
     let args=sprintf "install '%s' -Version %s -ExcludeVersion -o bin/" package (version.ToString())
-    let timeout = new TimeSpan(0,5,0)
+    let timeout = TimeSpan.FromMinutes 5.
+    let fileName = findNuget (currentDirectory @@ "tools" @@ "NuGet")
     let result = ProcessHelper.ExecProcessAndReturnMessages (fun info->
                     info.Arguments <- args
-                    info.FileName <- "./.nuget/nuget.exe" 
+                    info.FileName <- fileName
                     info.WorkingDirectory <- ""
                     ) timeout
     if result.ExitCode <> 0 || result.Errors.Count > 0 then failwithf "Error during NuGet download. %s" (toLines result.Errors) 

@@ -101,7 +101,6 @@ Target "pack" (fun _ ->
     NuGet setParams "./SemVer.FromAssembly/SemVer.FromAssembly.nuspec"
 )
 
-#r @"./packages/SemVer.FromAssembly/tools/SemVer.FromAssembly.exe"
 #load "SemVer.FromAssembly.FAKE.fsx"
 open SemVerFake
 Target "bump" (fun _ ->
@@ -112,7 +111,7 @@ Target "bump" (fun _ ->
     let version = bumpVersion magnitude (SemVerHelper.parse version)
     let orig= File.ReadAllText "RELEASE_NOTES.md"
     let new_=[sprintf "#### %s" (version.ToString()); orig]
-    File.WriteAllText("RELEASE_NOTES.md", String.Join(Environment.NewLine,new_ |> List.toArray ))
+    File.WriteAllText("RELEASE_NOTES.md", toLines new_)
 )
 
 // --------------------------------------------------------------------------------------
