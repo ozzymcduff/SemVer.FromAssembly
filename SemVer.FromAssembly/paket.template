@@ -1,7 +1,9 @@
 ﻿type project
-version 0.0.4
+version 0.0.5
 id SemVer.FromAssembly
 authors Oskar Gewalli
 summary
     Guess SemVer based on public surface changes
 licenseurl https://www.apache.org/licenses/LICENSE-2.0
+files
+    bin/Release/*.dll ==> tools
