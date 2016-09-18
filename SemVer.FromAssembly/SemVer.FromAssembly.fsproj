@@ -52,7 +52,7 @@
     <Compile Include="Script.fsx" />
     <Compile Include="SemVer.fs" />
     <None Include="paket.references" />
-    <None Include="paket.template" />
+    <None Include="SemVer.FromAssembly.nuspec" />
   </ItemGroup>
   <Import Project="$(FSharpTargetsPath)" />
   <Choose>

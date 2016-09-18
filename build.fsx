@@ -16,7 +16,7 @@ open System.IO
 let solutionFile  = "SemVer.FromAssembly.sln"
 
 // Pattern specifying assemblies to be tested using NUnit
-let testAssemblies = "**/bin/Release/*Tests.dll"
+let testAssemblies = "bin/**/*Tests.dll"
 
 // --------------------------------------------------------------------------------------
 // END TODO: The rest of the file includes standard build steps
@@ -35,7 +35,7 @@ let (|Fsproj|Csproj|Vbproj|) (projFileName:string) =
 // But keeps a subdirectory structure for each project in the 
 // src folder to support multiple project outputs
 Target "CopyBinaries" (fun _ ->
-    !! "src/**/*.??proj"
+    !! "**/*.??proj"
     |>  Seq.map (fun f -> ((System.IO.Path.GetDirectoryName f) @@ "bin/Release", "bin" @@ (System.IO.Path.GetFileNameWithoutExtension f)))
     |>  Seq.iter (fun (fromDir, toDir) -> CopyDir toDir fromDir (fun _ -> true))
 )
@@ -44,7 +44,7 @@ Target "CopyBinaries" (fun _ ->
 // Clean build results
 
 Target "clean" (fun _ ->
-    CleanDirs ["bin"; "temp"; 
+    CleanDirs ["bin"; "temp"; "NuGet";
             "Tests/bin/Debug";
             "Tests/bin/Debug"
             ] 
@@ -66,16 +66,40 @@ Target "test" (fun _ ->
 )
 
 
-Target "pack" (fun _ ->
-    Paket.Pack(fun p -> 
-        { p with
-            OutputPath = "bin"})
-)
-
 Target "push" (fun _ ->
     Paket.Push(fun p -> 
         { p with
-            WorkingDir = "bin" })
+            WorkingDir = "NuGet" })
+)
+let release = LoadReleaseNotes "RELEASE_NOTES.md"
+
+Target "pack" (fun _ ->
+    let authors = ["Oskar Gewalli"]
+    let package = "SemVer.FromAssembly"
+    let description = "Guess SemVer based on public surface changes"
+    let summary = "Helper tool to guess SemVer version based on public surface area differences between old and new package"
+    let nugetDir = "./NuGet"
+    let buildDir = "./SemVer.FromAssembly/bin/Release/"
+    let files = [
+                  (@"tools/*.dll", Some "tools", None)
+                  (@"tools/*.exe", Some "tools", None)
+                ]
+    let nugetToolsDir = nugetDir @@ "tools"
+    CleanDir nugetToolsDir
+    !! (buildDir @@ "**/*.*") |> Copy nugetToolsDir
+    let setParams p =
+        {p with
+            Authors = authors
+            Project = package
+            Description = description
+            Version = release.NugetVersion
+            OutputPath = nugetDir
+            ReleaseNotes = release.Notes |> toLines
+            Publish = false
+            Summary = summary
+            Files = files
+        }
+    NuGet setParams "./SemVer.FromAssembly/SemVer.FromAssembly.nuspec"
 )
 
 #r @"./packages/SemVer.FromAssembly/tools/SemVer.FromAssembly.exe"
@@ -83,7 +107,7 @@ open SemVer.FromAssembly
 
 Target "bump" (fun _ ->
     let compiled = "./SemVer.FromAssembly/bin/Release/SemVer.FromAssembly.exe"
-    let version = GetAssemblyVersionString compiled
+    let version = release.NugetVersion
     // Paket install the latest version OR use command line nuget:
     (*
     ProcessHelper.shellExec { 
@@ -113,6 +137,7 @@ Target "all" DoNothing
 "clean"
   ==> "build"
   ==> "pack"
+  ==> "push"
 
 "clean"
   ==> "build"
@@ -122,8 +147,5 @@ Target "all" DoNothing
 
 "build"
   ==> "bump"
-
-"pack"
-  ==> "push"
 
 RunTargetOrDefault "test"
