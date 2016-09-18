@@ -7,11 +7,12 @@ Autogenerate nuget package version based on surface area of the new package
 
 ## Usage
 
-USAGE: SemVer.FromAssembly.exe [--help] [--surface-of <path>] [--diff <original> <new>] [--magnitude <original> <new>]
+USAGE: SemVer.FromAssembly.exe [--help] [--surface-of <path>] [--output <path>] [--diff <original> <new>] [--magnitude <original> <new>]
 
 OPTIONS:
 
     --surface-of <path>   Get the public api surface of the .net binary as json
+    --output <path>       Send output to file
     --diff <original> <new>
                           Get the difference between two .net binaries as json
     --magnitude <original> <new>
