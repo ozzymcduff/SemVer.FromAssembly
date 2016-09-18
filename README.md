@@ -18,3 +18,7 @@ OPTIONS:
     --magnitude <original> <new>
                           Get the magnitude of the difference between two .net binaries
     --help                display this list of options.
+
+## Together with FAKE
+
+Download SemVer.FromAssembly.FAKE.fsx 
