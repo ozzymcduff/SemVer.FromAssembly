@@ -2,7 +2,7 @@ redirects: on
 source https://api.nuget.org/v3/index.json
 framework >= net451
 
-nuget FSharp.Core ~> 4 redirects: force
+nuget FSharp.Core redirects: force
 nuget NUnit 2.6.4
 nuget NUnit.Runners 2.6.4
 nuget FAKE
