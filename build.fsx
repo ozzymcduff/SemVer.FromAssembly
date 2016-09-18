@@ -77,7 +77,7 @@ Target "pack" (fun _ ->
     let authors = ["Oskar Gewalli"]
     let package = "SemVer.FromAssembly"
     let description = "Guess SemVer based on public surface changes"
-    let summary = "Helper tool to guess SemVer version based on public surface area differences between old and new package"
+    let summary = "Helper tool to guess SemVer version based on public surface area differences"
     let nugetDir = "./NuGet"
     let buildDir = "./SemVer.FromAssembly/bin/Release/"
     let files = [
