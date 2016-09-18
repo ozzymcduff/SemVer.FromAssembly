@@ -8,7 +8,6 @@ open Fake.Git
 open Fake.AssemblyInfoFile
 open Fake.ReleaseNotesHelper
 open Fake.UserInputHelper
-open Fake.VersionHelper
 open System
 open System.IO
 
@@ -117,14 +116,17 @@ Target "bump" (fun _ ->
         Args=[]
     }*)
     let maybeMagnitude = SemVer.getMagnitude "./packages/SemVer.FromAssembly/tools/SemVer.FromAssembly.exe" compiled
-    let v = parseVersion(version)
+    let v = SemVerHelper.parse(version)
     match maybeMagnitude with 
     | Result.Ok m ->
-        match m with
-        | Magnitude.Major m-> { v with Major=v.Major+1 }
-        | Magnitude.Minor m-> { v with Minor=v.Minor+1 }
-        | Magnitude.Patch m-> { v with Patch=v.Patch+1 }
-        |> printfn "%A"
+            let version = match m with
+                            | Magnitude.Major m-> { v with Major=v.Major+1 }
+                            | Magnitude.Minor m-> { v with Minor=v.Minor+1 }
+                            | Magnitude.Patch m-> { v with Patch=v.Patch+1 }
+            let orig= File.ReadAllText "RELEASE_NOTES.md"
+            let new_=[sprintf "#### %s" (version.ToString()); orig]
+            File.WriteAllText("RELEASE_NOTES.md", String.Join(Environment.NewLine,new_ |> List.toArray ))
+            //|> printfn "%A"
     | Result.Error err->
         printfn "Error: %s" err
     () 
