@@ -102,39 +102,23 @@ Target "pack" (fun _ ->
 )
 
 #r @"./packages/SemVer.FromAssembly/tools/SemVer.FromAssembly.exe"
+#load "SemVer.FromAssembly.FAKE.fs"
+open SemVerFake
 open SemVer.FromAssembly
-let downloadOldVersion version=
-    let args=sprintf "install SemVer.FromAssembly -Version %s -ExcludeVersion -o bin/" (version.ToString())
-    let timeout = new TimeSpan(0,5,0)
-    let result = ProcessHelper.ExecProcessAndReturnMessages (fun info->
-                    info.Arguments <- args
-                    info.FileName <- "./.nuget/nuget.exe" 
-                    info.WorkingDirectory <- ""
-                    ) timeout
-    if result.ExitCode <> 0 || result.Errors.Count > 0 then failwithf "Error during NuGet download. %s" (toLines result.Errors) 
-
-
 Target "bump" (fun _ ->
     let compiled = "./SemVer.FromAssembly/bin/Release/SemVer.FromAssembly.exe"
     let version = release.NugetVersion
-    // Paket install the latest version OR use command line nuget:
-    let args=sprintf "install SemVer.FromAssembly -Version %s -ExcludeVersion -o bin/" version
-    downloadOldVersion version
+    downloadOldVersion "SemVer.FromAssembly" version
     let maybeMagnitude = SemVer.getMagnitude "./bin/SemVer.FromAssembly/tools/SemVer.FromAssembly.exe" compiled
     let v = SemVerHelper.parse(version)
     match maybeMagnitude with 
-    | Result.Ok m ->
-            let version = match m with
-                            | Magnitude.Major m-> { v with Major=v.Major+1 }
-                            | Magnitude.Minor m-> { v with Minor=v.Minor+1 }
-                            | Magnitude.Patch m-> { v with Patch=v.Patch+1 }
+    | Result.Ok m -> 
+            let version = bumpVersion m v
             let orig= File.ReadAllText "RELEASE_NOTES.md"
             let new_=[sprintf "#### %s" (version.ToString()); orig]
             File.WriteAllText("RELEASE_NOTES.md", String.Join(Environment.NewLine,new_ |> List.toArray ))
-            //|> printfn "%A"
     | Result.Error err->
         printfn "Error: %s" err
-    () 
 )
 
 // --------------------------------------------------------------------------------------

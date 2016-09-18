@@ -16,8 +16,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		build.fsx = build.fsx
 		README.md = README.md
-		SemVer.FromAssembly.FAKE.fsx = SemVer.FromAssembly.FAKE.fsx
 		RELEASE_NOTES.md = RELEASE_NOTES.md
+		SemVer.FromAssembly.FAKE.fs = SemVer.FromAssembly.FAKE.fs
 	EndProjectSection
 EndProject
 Global
