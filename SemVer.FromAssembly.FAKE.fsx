@@ -1,4 +1,6 @@
 module SemVerFake
+#r @"./packages/SemVer.FromAssembly/tools/SemVer.FromAssembly.exe"
+#r @"packages/FAKE/tools/FakeLib.dll"
 
 open Fake.SemVerHelper
 open SemVer.FromAssembly

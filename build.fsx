@@ -102,7 +102,7 @@ Target "pack" (fun _ ->
 )
 
 #r @"./packages/SemVer.FromAssembly/tools/SemVer.FromAssembly.exe"
-#load "SemVer.FromAssembly.FAKE.fs"
+#load "SemVer.FromAssembly.FAKE.fsx"
 open SemVerFake
 open SemVer.FromAssembly
 Target "bump" (fun _ ->
@@ -110,7 +110,7 @@ Target "bump" (fun _ ->
     let version = release.NugetVersion
     downloadOldVersion "SemVer.FromAssembly" version
     let maybeMagnitude = SemVer.getMagnitude "./bin/SemVer.FromAssembly/tools/SemVer.FromAssembly.exe" compiled
-    let v = SemVerHelper.parse(version)
+    let v = SemVerHelper.parse version
     match maybeMagnitude with 
     | Result.Ok m -> 
             let version = bumpVersion m v
