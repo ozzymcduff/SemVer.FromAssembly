@@ -102,13 +102,12 @@ Target "pack" (fun _ ->
 )
 
 #load "SemVer.FromAssembly.FAKE.fsx"
-open SemVerFake
 Target "bump" (fun _ ->
     let compiled = "./SemVer.FromAssembly/bin/Release/SemVer.FromAssembly.exe"
     let version = release.NugetVersion
-    downloadOldVersion "SemVer.FromAssembly" version
-    let magnitude = getMagnitude "./bin/SemVer.FromAssembly/tools/SemVer.FromAssembly.exe" compiled
-    let version = bumpVersion magnitude (SemVerHelper.parse version)
+    SemVerFake.downloadOldVersion "SemVer.FromAssembly" version
+    let magnitude = SemVerFake.getMagnitude "./bin/SemVer.FromAssembly/tools/SemVer.FromAssembly.exe" compiled
+    let version = SemVerFake.bumpVersion magnitude (SemVerHelper.parse version)
     let orig= File.ReadAllText "RELEASE_NOTES.md"
     let new_=[sprintf "#### %s" (version.ToString()); orig]
     File.WriteAllText("RELEASE_NOTES.md", toLines new_)
