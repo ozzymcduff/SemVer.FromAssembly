@@ -103,19 +103,24 @@ Target "pack" (fun _ ->
 
 #r @"./packages/SemVer.FromAssembly/tools/SemVer.FromAssembly.exe"
 open SemVer.FromAssembly
+let downloadOldVersion version=
+    let args=sprintf "install SemVer.FromAssembly -Version %s -ExcludeVersion -o bin/" (version.ToString())
+    let timeout = new TimeSpan(0,5,0)
+    let result = ProcessHelper.ExecProcessAndReturnMessages (fun info->
+                    info.Arguments <- args
+                    info.FileName <- "./.nuget/nuget.exe" 
+                    info.WorkingDirectory <- ""
+                    ) timeout
+    if result.ExitCode <> 0 || result.Errors.Count > 0 then failwithf "Error during NuGet download. %s" (toLines result.Errors) 
+
 
 Target "bump" (fun _ ->
     let compiled = "./SemVer.FromAssembly/bin/Release/SemVer.FromAssembly.exe"
     let version = release.NugetVersion
     // Paket install the latest version OR use command line nuget:
-    (*
-    ProcessHelper.shellExec { 
-        CommandLine=sprintf "install SemVer.FromAssembly -Version %s -ExcludeVersion -o bin/" version
-        Program="nuget" // using nuget gem ...
-        WorkingDirectory=""
-        Args=[]
-    }*)
-    let maybeMagnitude = SemVer.getMagnitude "./packages/SemVer.FromAssembly/tools/SemVer.FromAssembly.exe" compiled
+    let args=sprintf "install SemVer.FromAssembly -Version %s -ExcludeVersion -o bin/" version
+    downloadOldVersion version
+    let maybeMagnitude = SemVer.getMagnitude "./bin/SemVer.FromAssembly/tools/SemVer.FromAssembly.exe" compiled
     let v = SemVerHelper.parse(version)
     match maybeMagnitude with 
     | Result.Ok m ->
