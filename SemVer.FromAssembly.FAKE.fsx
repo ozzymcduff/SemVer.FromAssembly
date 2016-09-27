@@ -7,8 +7,8 @@ open SemVer.FromAssembly
 open Fake
 open System
 
-let downloadOldVersion package version=
-    let args=sprintf "install '%s' -Version %s -ExcludeVersion -o bin/" package (version.ToString())
+let downloadOldVersion package =
+    let args=sprintf "install '%s' -ExcludeVersion -o bin/" package
     let timeout = TimeSpan.FromMinutes 5.
     let fileName = findNuget (currentDirectory @@ "tools" @@ "NuGet")
     let result = ProcessHelper.ExecProcessAndReturnMessages (fun info->

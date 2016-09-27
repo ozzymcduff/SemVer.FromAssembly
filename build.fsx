@@ -105,7 +105,7 @@ Target "pack" (fun _ ->
 Target "bump" (fun _ ->
     let compiled = "./SemVer.FromAssembly/bin/Release/SemVer.FromAssembly.exe"
     let version = release.NugetVersion
-    SemVerFake.downloadOldVersion "SemVer.FromAssembly" version
+    SemVerFake.downloadOldVersion "SemVer.FromAssembly"
     let magnitude = SemVerFake.getMagnitude "./bin/SemVer.FromAssembly/tools/SemVer.FromAssembly.exe" compiled
     let version = SemVerFake.bumpVersion magnitude (SemVerHelper.parse version)
     let orig= File.ReadAllText "RELEASE_NOTES.md"

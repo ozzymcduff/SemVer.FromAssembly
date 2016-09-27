@@ -67,8 +67,10 @@ module SemVer=
             | Result.Error msg->Console.Error.WriteLine msg ; 1
 
         let all = results.GetAllResults()
-        if List.isEmpty all || results.IsUsageRequested then
+        if List.isEmpty all then
             Result.Error(parser.PrintUsage())
+        elif results.IsUsageRequested then
+            Ok(parser.PrintUsage())
         else
             let maybeFile = results.TryGetResult(<@ Surface_of @>)
             let maybeDiff = results.TryGetResult(<@ Diff @>)
