@@ -82,6 +82,7 @@ Target "pack" (fun _ ->
     let files = [
                   (@"tools/*.dll", Some "tools", None)
                   (@"tools/*.exe", Some "tools", None)
+                  (@"tools/*.config", Some "tools", None)
                 ]
     let nugetToolsDir = nugetDir @@ "tools"
     CleanDir nugetToolsDir

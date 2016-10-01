@@ -53,6 +53,7 @@
     <Compile Include="SemVer.fs" />
     <None Include="paket.references" />
     <None Include="SemVer.FromAssembly.nuspec" />
+    <None Include="app.config" />
   </ItemGroup>
   <Import Project="$(FSharpTargetsPath)" />
   <Choose>
