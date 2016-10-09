@@ -21,7 +21,7 @@ OPTIONS:
 
 ## Together with FAKE
 
-Download SemVer.FromAssembly.FAKE.fsx 
+Download and modify [SemVer.FromAssembly.FAKE.fsx](https://github.com/wallymathieu/SemVer.FromAssembly/blob/master/SemVer.FromAssembly.FAKE.fsx) 
 
 ## Together with Cake
 
