@@ -20,8 +20,8 @@ let downloadOldVersion package =
 
 let bumpVersion magnitude (version:SemVerInfo)=
     match magnitude with
-        | Magnitude.Major -> { version with Major=version.Major+1 }
-        | Magnitude.Minor -> { version with Minor=version.Minor+1 }
+        | Magnitude.Major -> { version with Major=version.Major+1; Minor=0; Patch=0 }
+        | Magnitude.Minor -> { version with Minor=version.Minor+1; Patch=0 }
         | Magnitude.Patch -> { version with Patch=version.Patch+1 }
         | m                -> failwithf "Unknown magnitude %s" (m.ToString())
 
