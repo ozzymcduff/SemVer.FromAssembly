@@ -1,2 +1,5 @@
 build_script:
   - build.cmd build
+skip_commits:
+  files:
+    - README.md
