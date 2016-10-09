@@ -22,3 +22,7 @@ OPTIONS:
 ## Together with FAKE
 
 Download SemVer.FromAssembly.FAKE.fsx 
+
+## Together with Cake
+
+Use [Cake.SemVer.FromAssembly](https://github.com/wallymathieu/Cake.SemVer.FromAssembly)
