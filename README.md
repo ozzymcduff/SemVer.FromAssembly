@@ -26,3 +26,44 @@ Download and modify [SemVer.FromAssembly.FAKE.fsx](https://github.com/wallymathi
 ## Together with Cake
 
 Use [Cake.SemVer.FromAssembly](https://github.com/wallymathieu/Cake.SemVer.FromAssembly)
+
+## Together with Albacore and Rake 
+
+```
+require "tmpdir"
+require "fileutils"
+require "securerandom"
+require "nuget_helper"
+
+def magnitude_next_nuget_version(package_name, next_dll)
+  begin
+    tmp = File.join(Dir.tmpdir, SecureRandom.hex)
+    NugetHelper.exec("install '#{package_name}' -o #{tmp} ")
+    orig = Dir.glob( File.join(tmp, "**", File.basename(next_dll)) ).first
+    path_to_package = Dir.glob( File.join(tmp, "*") ).first 
+    v = SemVer.parse(path_to_package)
+    m = NugetHelper.run_tool_with_result(NugetHelper.semver_fromassembly_path, " --magnitude #{orig} #{next_dll}").strip
+    case m
+    when 'Patch'
+      v.patch += 1
+      v
+    when 'Major'
+      v.major += 1
+      v.minor = 0
+      v.patch = 0
+      v
+    when 'Minor'
+      v.minor += 1
+      v.patch = 0
+      v
+    end
+  ensure
+    FileUtils.rm_rf(tmp)
+  end
+end
+
+task :bump do
+    v = magnitude_next_nuget_version "PACKAGE_NAME", "PACKAGE/bin/Debug/PACKAGE.dll"
+    # use v to set the version
+end
+```
