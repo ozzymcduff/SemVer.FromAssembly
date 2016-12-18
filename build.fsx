@@ -10,6 +10,11 @@ open Fake.ReleaseNotesHelper
 open Fake.UserInputHelper
 open System
 open System.IO
+#if MONO
+#else
+#load "packages/build/SourceLink.Fake/tools/Fake.fsx"
+open SourceLink
+#endif
 
 // File system information 
 let solutionFile  = "SemVer.FromAssembly.sln"
