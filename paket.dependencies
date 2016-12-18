@@ -9,3 +9,10 @@ nuget FAKE
 nuget Argu
 nuget Chiron
 nuget SemVer.FromAssembly
+
+group Build  
+  source https://api.nuget.org/v3/index.json
+  nuget SourceLink.Fake
+  nuget FAKE
+  nuget FSharp.Formatting
+

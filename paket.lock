@@ -100,3 +100,15 @@ NUGET
     System.Threading.ThreadPool (4.0.10) - redirects: force, framework: >= net463
     System.Threading.Timer (4.0.1) - redirects: force
     System.Xml.XDocument (4.0.11) - framework: >= net463
+
+GROUP Build
+NUGET
+  remote: http://api.nuget.org/v3/index.json
+    FAKE (4.47)
+    FSharp.Compiler.Service (2.0.0.6)
+    FSharp.Formatting (2.14.4)
+      FSharp.Compiler.Service (2.0.0.6)
+      FSharpVSPowerTools.Core (>= 2.3 < 2.4)
+    FSharpVSPowerTools.Core (2.3)
+      FSharp.Compiler.Service (>= 2.0.0.3)
+    SourceLink.Fake (1.1)
