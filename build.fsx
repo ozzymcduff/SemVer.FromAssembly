@@ -46,7 +46,7 @@ let configuration = "Release"
 // Git configuration (used for publishing documentation in gh-pages branch)
 // The profile where the project is posted
 let gitOwner = "wallymathieu"
-let gitHome = sprintf "%s/%s" "##GitUrl##" gitOwner
+let gitHome = sprintf "%s/%s" "https://github.com" gitOwner
 
 // The name of the project on GitHub
 let gitName = "SemVer.FromAssembly"
