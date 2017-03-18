@@ -28,6 +28,9 @@
     <PlatformTarget>
     </PlatformTarget>
   </PropertyGroup>
+  <PropertyGroup Condition="$(VisualStudioVersion)==''">
+    <VisualStudioVersion>15.0</VisualStudioVersion>
+  </PropertyGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '11.0'">
       <PropertyGroup Condition="Exists('$(MSBuildExtensionsPath32)\..\Microsoft SDKs\F#\3.0\Framework\v4.0\Microsoft.FSharp.Targets')">
