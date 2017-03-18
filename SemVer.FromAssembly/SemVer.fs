@@ -2,19 +2,18 @@
 open System
 open Argu
 open Chiron
+open SynVer
 open System.Reflection
 open System.IO
 type CLIArguments =
     | Surface_of of path:string
     | Output of path:string
-    | Diff of original:string * ``new``:string
     | Magnitude of original:string * ``new``:string
 with
     interface IArgParserTemplate with
         member s.Usage =
             match s with
             | Surface_of _ -> "Get the public api surface of the .net binary as json"
-            | Diff _ -> "Get the difference between two .net binaries as json"
             | Magnitude _-> "Get the magnitude of the difference between two .net binaries"
             | Output _-> "Send output to file"
 module SemVer=
@@ -36,13 +35,13 @@ module SemVer=
         else
             Result.Error (sprintf "Could not find file %s " file)
 
-    let getDiff original new_ : Result<PackageChanges,string>=
+    let getDiff original new_ : Result<string,string>=
         let maybeOriginal,maybeNew_= surfaceAreaCli original, surfaceAreaCli new_
         match maybeOriginal,maybeNew_ with
         | Ok original, Ok new_ ->
 
-            let changes =  Compare.comparePackages original new_
-            changes
+            let changes =  SurfaceArea.diff original new_
+            String.Join(Environment.NewLine, changes)
             |> Ok
         | _, _ ->
             let errors = 
@@ -51,9 +50,21 @@ module SemVer=
                 |> List.toArray
             
             Result.Error (String.Join(Environment.NewLine, errors) )
-    let getMagnitude original new_ : Result<Magnitude,string>=
-            getDiff original new_
-            |> Result.map Compare.packageChangeMagnitude 
+    let getMagnitude verNr original new_ : Result<string,string>=
+        let maybeOriginal,maybeNew_= surfaceAreaCli original, surfaceAreaCli new_
+        match maybeOriginal,maybeNew_ with
+        | Ok original, Ok new_ ->
+
+            let (version,magnitude) =  SurfaceArea.bump verNr original new_
+            magnitude.ToString()
+            |> Ok
+        | _, _ ->
+            let errors = 
+                [maybeOriginal;maybeNew_] 
+                |> List.choose (fun r-> match r with Result.Error e-> Some e | _ -> None)
+                |> List.toArray
+            
+            Result.Error (String.Join(Environment.NewLine, errors) )
 
 
     [<EntryPoint>]
@@ -73,27 +84,19 @@ module SemVer=
             Ok(parser.PrintUsage())
         else
             let maybeFile = results.TryGetResult(<@ Surface_of @>)
-            let maybeDiff = results.TryGetResult(<@ Diff @>)
+            //let maybeDiff = results.TryGetResult(<@ Diff @>)
             let maybeMagnitude = results.TryGetResult(<@ Magnitude @>)
             let maybeOutput = results.TryGetResult(<@ Output @>)
-            match maybeFile, maybeDiff, maybeMagnitude with
-            | Some file, None, None ->
+            match maybeFile, (*maybeDiff,*) maybeMagnitude with
+            | Some file, None ->
                 let assembly = Assembly.LoadFrom(file)
-                (SurfaceArea.get assembly)
+                (SurfaceArea.ofAssembly assembly)
                 |> Json.serialize
                 |> Json.formatWith JsonFormattingOptions.Pretty
                 |> Result.Ok
-            | None, Some ( original,new_), None ->
-                getDiff original new_
-                |> Result.map (fun diff->
-                    diff
-                    |> Json.serialize
-                    |> Json.formatWith JsonFormattingOptions.Pretty
-                    ) 
-            | None, None, Some (original,new_) ->
-                getMagnitude original new_
-                |> Result.map (fun m-> m.ToString()) 
-            | _, _,_ ->
+            | None, Some (original,new_) ->
+                getMagnitude "" original new_
+            | _,_ ->
                 Result.Error(parser.PrintUsage())
             |> (fun res-> 
                 match res, maybeOutput with

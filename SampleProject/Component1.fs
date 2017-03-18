@@ -2,6 +2,7 @@
 
 type Class1() = 
     member this.X = "F#"
+    member this.Y = "F#"
 
 module Module=
     let t = 1
