@@ -89,7 +89,7 @@ module SemVer=
             let maybeOutput = results.TryGetResult(<@ Output @>)
             match maybeFile, (*maybeDiff,*) maybeMagnitude with
             | Some file, None ->
-                let assembly = Assembly.LoadFrom(file)
+                let assembly = Assembly.LoadFrom(Path.GetFullPath file)
                 (SurfaceArea.ofAssembly assembly)
                 |> Json.serialize
                 |> Json.formatWith JsonFormattingOptions.Pretty

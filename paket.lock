@@ -7,16 +7,12 @@ NUGET
     Chiron (6.2.1)
       Aether (>= 8.0.2 < 9.0)
       FParsec (>= 1.0 < 2.0)
+    FAKE (4.56)
     FParsec (1.0.2)
     FSharp.Core (4.0.0.1) - redirects: force
     NUnit (2.6.4)
     NUnit.Runners (2.6.4)
-    SynVer.Lib (0.0.3)
-      Chiron
+    SemVer.FromAssembly (0.0.9)
+    SynVer.Lib (0.0.4)
+      Chiron (>= 6.0 < 7.0)
       FSharp.Core (>= 4.0 < 4.1)
-  remote: http://api.nuget.org/v3/index.json
-    FAKE (4.39.1)
-    SemVer.FromAssembly (0.0.6)
-      Argu
-      Chiron
-      FSharp.Core

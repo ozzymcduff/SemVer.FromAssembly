@@ -102,18 +102,6 @@ Target "pack" (fun _ ->
     NuGet setParams "./SemVer.FromAssembly/SemVer.FromAssembly.nuspec"
 )
 
-#load "SemVer.FromAssembly.FAKE.fsx"
-Target "bump" (fun _ ->
-    let compiled = "./SemVer.FromAssembly/bin/Release/SemVer.FromAssembly.exe"
-    let version = release.NugetVersion
-    SemVerFake.downloadOldVersion "SemVer.FromAssembly"
-    let magnitude = SemVerFake.getMagnitude "./bin/SemVer.FromAssembly/tools/SemVer.FromAssembly.exe" compiled
-    let version = SemVerFake.bumpVersion magnitude (SemVerHelper.parse version)
-    let orig= File.ReadAllText "RELEASE_NOTES.md"
-    let new_=[sprintf "#### %s" (version.ToString()); orig]
-    File.WriteAllText("RELEASE_NOTES.md", toLines new_)
-)
-
 // --------------------------------------------------------------------------------------
 // Run all targets by default. Invoke 'build <Target>' to override
 
@@ -129,7 +117,5 @@ Target "all" DoNothing
   ==> "test"
   ==> "all"
 
-"build"
-  ==> "bump"
 
 RunTargetOrDefault "test"
