@@ -1,4 +1,6 @@
 #### 0.0.10
+* Better error message
+#### 0.0.10
 * Small bug fix
 #### 0.0.9
 * The tool is now implemented using Syntactic Versioning library 

@@ -5,8 +5,7 @@ framework >= net451
 nuget FSharp.Core redirects: force
 nuget NUnit 2.6.4
 nuget NUnit.Runners 2.6.4
-nuget FAKE ~> 4
-nuget Argu ~> 3
-nuget Chiron ~> 6
-nuget SemVer.FromAssembly
+nuget FAKE >= 4.55
+nuget Argu
+nuget Chiron
 nuget SynVer.Lib

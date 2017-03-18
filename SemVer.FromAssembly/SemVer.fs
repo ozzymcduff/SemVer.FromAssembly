@@ -16,7 +16,18 @@ with
             | Surface_of _ -> "Get the public api surface of the .net binary as json"
             | Magnitude _-> "Get the magnitude of the difference between two .net binaries"
             | Output _-> "Send output to file"
+
+
 module SemVer=
+    let loadAssembly f =
+      try
+        Assembly.LoadFile (Path.GetFullPath f)
+        |> Ok
+      with ex ->
+        (sprintf "Failed to load assembly %s due to %s\n%s" f ex.Message ex.StackTrace) 
+        |> Result.Error
+
+
     let surfaceAreaCli file : Result<Package,string>=
         if File.Exists file then
             let exe = typeof<CLIArguments>.Assembly.Location
@@ -89,11 +100,12 @@ module SemVer=
             let maybeOutput = results.TryGetResult(<@ Output @>)
             match maybeFile, (*maybeDiff,*) maybeMagnitude with
             | Some file, None ->
-                let assembly = Assembly.LoadFrom(Path.GetFullPath file)
-                (SurfaceArea.ofAssembly assembly)
-                |> Json.serialize
-                |> Json.formatWith JsonFormattingOptions.Pretty
-                |> Result.Ok
+                loadAssembly( file)
+                |> Result.map(
+                    SurfaceArea.ofAssembly
+                    >> Json.serialize
+                    >> Json.formatWith JsonFormattingOptions.Pretty
+                )
             | None, Some (original,new_) ->
                 getMagnitude "" original new_
             | _,_ ->
